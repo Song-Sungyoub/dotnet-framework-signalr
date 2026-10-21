@@ -1,0 +1,17 @@
+name: build
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore SignalR.Library.sln
+      - run: dotnet build SignalR.Library.sln -c Release --no-restore
+      - run: '& ./tests/SignalR.Library.Checks/bin/Release/net48/SignalR.Library.Checks.exe'
+        shell: pwsh
+      - run: dotnet pack src/SignalR.Library/SignalR.Library.csproj -c Release --no-build -o artifacts
